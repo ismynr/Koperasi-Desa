@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\Scopes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable 
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, Scopes;
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +19,9 @@ class User extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -41,4 +42,44 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function anggota()
+    {
+        return $this->hasOne(Anggota::class, 'user_id');
+    }
+
+    public function tabungan()
+    {
+        return $this->hasMany(Tabungan::class, 'user_id');
+    }
+
+    public function pinjaman()
+    {
+        return $this->hasMany(Pinjaman::class, 'user_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role == 1;
+    }
+
+    public function isAnggota()
+    {
+        return $this->role == 2;
+    }
+
+    public function myRole()
+    {
+        return $this->role;
+    }
+
+    public function hasRole($role)
+    {
+        if ($this->role == $role) {
+            return true;
+        }
+        
+        return false;
+    }
+
 }

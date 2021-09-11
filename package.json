@@ -10,9 +10,20 @@
         "production": "mix --production"
     },
     "devDependencies": {
+        "@popperjs/core": "^2.5.3",
+        "alpinejs": "^3.2.6",
+        "autoprefixer": "^10.1.0",
         "axios": "^0.21",
+        "bootstrap": "^5.1.0",
+        "datatables.net": "^1.11.2",
+        "datatables.net-bs4": "^1.11.2",
+        "jquery": "^3.6.0",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
-        "postcss": "^8.1.14"
+        "postcss": "^8.2.1",
+        "resolve-url-loader": "^4.0.0",
+        "sass": "^1.39.0",
+        "sass-loader": "^12.1.0",
+        "sweetalert2": "^11.1.5"
     }
 }
