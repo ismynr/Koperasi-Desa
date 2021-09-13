@@ -13,11 +13,13 @@ use Yajra\DataTables\DataTables;
 
 class PenarikanController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(Anggota::class, 'anggota');
-    }
-
+    /**
+     * Menampilkan halaman utama
+     * 
+     * @param Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -43,14 +45,26 @@ class PenarikanController extends Controller
         return view('admin.penarikan.index');
     }
 
+    /**
+     * Menampilkan formulir untuk membuat resource baru
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function create()
     {
         $jenisTabungan = JenisTabungan::all();
         $user = User::withWhereHas('anggota')->get();
-
+        
         return view('admin.penarikan.create', compact('jenisTabungan', 'user'));
     }
 
+    /**
+     * Simpan resource yang baru dibuat di penyimpanan.
+     * 
+     * @param \App\Http\Requests\PenarikanRequest $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function store(PenarikanRequest $request)
     {
         DB::transaction(function() use ($request) {
@@ -65,25 +79,5 @@ class PenarikanController extends Controller
         });
 
         return redirect()->route('penarikan.index')->withSuccess('Berhasil Disimpan !');
-    }
-
-    public function show(Tabungan $tabungan)
-    {
-        //
-    }
-
-    public function edit(Tabungan $tabungan)
-    {
-        //
-    }
-
-    public function update(Request $request, Tabungan $tabungan)
-    {
-        //
-    }
-
-    public function destroy(Tabungan $tabungan)
-    {
-        //
     }
 }

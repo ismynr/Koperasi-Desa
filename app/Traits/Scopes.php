@@ -6,8 +6,13 @@ trait Scopes
 {
 
     /**
-     * Merging with() and whereHas() metod models
+     * Merging with() and whereHas() method models
      * 
+     * @param mixed $query
+     * @param mixed $relation
+     * @param null $constraint
+     * 
+     * @return $query
      */
     public function scopeWithWhereHas($query, $relation, $constraint = null)
     {

@@ -14,6 +14,13 @@ use Yajra\DataTables\DataTables;
 
 class SetoranTabunganController extends Controller
 {
+    /**
+     * Menampilkan halaman utama
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         $countSetorTerbayar = Tabungan::where('user_id', auth()->id())
@@ -25,10 +32,10 @@ class SetoranTabunganController extends Controller
 
         // generate tanggal dari awal daftar anggota
         $period = new DatePeriod(
-            new DateTime(date('Y-m-d H:i:s', strtotime(auth()->user()->created_at. ' + '.$countSetorTerbayar.' months'))),
-            new DateInterval('P1M'),
-            new DateTime(date('Y-m-d H:i:s', strtotime(' + 1 month')))
-        );
+                        new DateTime(date('Y-m-d H:i:s', strtotime(auth()->user()->created_at. ' + '.$countSetorTerbayar.' months'))),
+                        new DateInterval('P1M'),
+                        new DateTime(date('Y-m-d H:i:s', strtotime(' + 1 month')))
+                    );
 
         $arr = [];
         foreach ($period as $value) {

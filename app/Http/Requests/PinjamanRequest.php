@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TabunganRequest extends FormRequest
+class PinjamanRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,10 @@ class TabunganRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|numeric',
-            'jenis_tabungan_id' => 'required|numeric',
-            'jml_tabungan' => 'required|numeric|digits_between:5,11',
+            'jml_pinjaman' => 'required|numeric|digits_between:5,11',
+            'tenor' => 'required|numeric|digits_between:1,2',
+            'total_pinjaman' => 'required|numeric|digits_between:5,11',
+            'tujuan_pinjaman' => 'required',
         ];
     }
 }

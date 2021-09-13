@@ -18,11 +18,13 @@ use Yajra\DataTables\DataTables;
 
 class TabunganController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(Anggota::class, 'anggota');
-    }
-
+    /**
+     * Menampilkan halaman utama
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -51,6 +53,11 @@ class TabunganController extends Controller
         return view('admin.tabungan.index');
     }
 
+    /**
+     * Menampilkan formulir untuk membuat resource baru
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function create()
     {
         $jenisTabungan = JenisTabungan::all();
@@ -59,6 +66,13 @@ class TabunganController extends Controller
         return view('admin.tabungan.create', compact('jenisTabungan', 'user'));
     }
 
+    /**
+     * Simpan resource yang baru dibuat di penyimpanan.
+     * 
+     * @param \App\Http\Requests\TabunganRequest $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function store(TabunganRequest $request)
     {
         DB::transaction(function() use ($request) {
@@ -75,6 +89,15 @@ class TabunganController extends Controller
         return redirect()->route('tabungan.index')->withSuccess('Berhasil Disimpan !');
     }
 
+    /**
+     * Return riwayat tagihan lunas setoran tabungan dengan format datatables
+     * dan menampilkan view 
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Anggota $tabungan
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function show(Request $request, Anggota $tabungan)
     {
         $arr = $this->generateTagihan($tabungan);
@@ -83,6 +106,7 @@ class TabunganController extends Controller
             $data = new Collection;
             $latestSaldo = Tabungan::where('user_id', $tabungan->user->id)->orderBy('created_at', 'desc')->first();
 
+            // Jika tidak ada tabungan dengan jenis 1 (pokok)
             if (!$this->countSetor(1, $tabungan->user->id)){
                 $data->push([
                     'tgl_seharusnya' => date('d-m-Y', strtotime($tabungan->user->created_at)),
@@ -119,21 +143,13 @@ class TabunganController extends Controller
         return view('admin.tabungan.show', compact('anggota'));
     }
 
-    public function edit(Tabungan $tabungan)
-    {
-        //
-    }
-
-    public function update(Request $request, Tabungan $tabungan)
-    {
-        //
-    }
-
-    public function destroy(Tabungan $tabungan)
-    {
-        //
-    }
-
+    /**
+     * Return tagihan setoran dengan format datatables
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function tagihan(Request $request)
     {
         if ($request->ajax()) {
@@ -161,14 +177,21 @@ class TabunganController extends Controller
         return view('admin.tabungan.index');
     }
 
+    /**
+     * Generate tagihan dengan return tanggal sesuai dengan tanggal awal - tanggal akhir
+     * 
+     * @param mixed $anggota
+     * 
+     * @return array
+     */
     private function generateTagihan($anggota)
     {
         // generate tanggal dari awal daftar anggota
         $period = new DatePeriod(
-            new DateTime(date('Y-m-d H:i:s', strtotime($anggota->user->created_at. ' + '.$this->countSetor(2, $anggota->user->id).' months'))),
-            new DateInterval('P1M'),
-            new DateTime(date('Y-m-d H:i:s', strtotime(' + 1 month')))
-        );
+                        new DateTime(date('Y-m-d H:i:s', strtotime($anggota->user->created_at. ' + '.$this->countSetor(2, $anggota->user->id).' months'))),
+                        new DateInterval('P1M'),
+                        new DateTime(date('Y-m-d H:i:s', strtotime(' + 1 month')))
+                    );
 
         $arr = [];
         foreach ($period as $value) {
@@ -178,6 +201,14 @@ class TabunganController extends Controller
         return $arr;
     }
     
+    /**
+     * Menjumlahhkan semua tabungan berdasarkan user_id dan jenis_tabungan_id
+     * 
+     * @param mixed $jenis
+     * @param mixed $userId
+     * 
+     * @return \App\Models\Tabungan
+     */
     private function countSetor($jenis, $userId)
     {
         return Tabungan::where('user_id', $userId)

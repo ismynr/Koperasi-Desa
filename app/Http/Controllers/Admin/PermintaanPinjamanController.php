@@ -5,23 +5,24 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pinjaman;
 use Illuminate\Http\Request;
-use DataTables;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\DataTables;
 
 class PermintaanPinjamanController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(Pinjaman::class, 'pinjaman');
-    }
-
+    /**
+     * Menampilkan halaman utama
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
             $data = Pinjaman::where('disetujui', '0')->get();
             
-            return Datatables::of($data)
+            return DataTables::of($data)
                     ->addIndexColumn()
                     ->editColumn('nama', function($data) {
                         return [
@@ -38,39 +39,32 @@ class PermintaanPinjamanController extends Controller
         return view('admin.permintaan-pengajuan.index');
     }
 
-    public function create()
-    {
-        //
-    }
-
-    public function store(Request $request)
-    {
-        //
-    }
-
-    public function show(Pinjaman $pinjaman)
-    {
-        //
-    }
-
-    public function edit(Pinjaman $pinjaman)
-    {
-        //
-    }
-
+    /**
+     * Perbarui resource yang ditentukan dalam penyimpanan.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Pinjaman $pinjaman
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, Pinjaman $pinjaman)
     {
         DB::transaction(function() use ($pinjaman) {
-
             $pinjaman->update([
                 'disetujui' => '1'
             ]);
-
         });
 
         return redirect()->route('permintaan-pinjaman.index')->withSuccess('Berhasil Disimpan !');
     }
 
+    /**
+     * Hapus resource yang ditentukan dari penyimpanan.
+     * 
+     * @param \App\Models\Pinjaman $pinjaman
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function destroy(Pinjaman $pinjaman)
     {
         DB::transaction(function() use ($pinjaman) {

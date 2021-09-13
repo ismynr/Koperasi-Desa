@@ -23,16 +23,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function () { 
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
-
 Route::middleware(['auth'])->group(function() {
 
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    /**
+     * Rute untuk role akses Admin
+     * 
+     */
     Route::middleware(['role:1'])->group(function() {
         Route::resource('anggota', AnggotaController::class)->parameter('anggota', 'anggota');
         Route::resource('penarikan', PenarikanController::class)->parameter('penarikan', 'penarikan');
@@ -48,6 +52,10 @@ Route::middleware(['auth'])->group(function() {
         Route::post('pengaturan/{id}', [PengaturanController::class, 'update'])->name('pengaturan.update');
     });
 
+    /**
+     * Rute untuk role akses Anggota
+     * 
+     */
     Route::middleware(['role:2'])->group(function(){
         Route::resource('pengajuan-pinjaman', PengajuanPinjamanController::class)->parameter('pengajuan-pinjaman', 'pinjaman');
         Route::get('pengajuan-pinjaman-tagihan/{pinjaman}', [PengajuanPinjamanController::class, 'tagihan'])->name('pengajuan-pinjaman.tagihan');

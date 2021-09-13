@@ -25,5 +25,8 @@
         "sass": "^1.39.0",
         "sass-loader": "^12.1.0",
         "sweetalert2": "^11.1.5"
+    },
+    "dependencies": {
+        "selenium-webdriver": "^4.0.0-rc-1"
     }
 }

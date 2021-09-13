@@ -4,18 +4,24 @@ namespace App\Http\Controllers\Anggota;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tabungan;
-use App\Models\User;
 use Illuminate\Http\Request;
-use DataTables;
+use Yajra\DataTables\DataTables;
 
 class MutasiAnggotaController extends Controller
 {
+    /**
+     * Menampilkan halaman utama
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
             $data = Tabungan::where('user_id', auth()->id())->get();
             
-            return Datatables::of($data)
+            return DataTables::of($data)
                     ->addIndexColumn()
                     ->editColumn('jenis_tabungan', function($data) {
                         return $data->jenisTabungan->jenis_tabungan;

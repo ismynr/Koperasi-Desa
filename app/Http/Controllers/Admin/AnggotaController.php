@@ -3,31 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AnggotaRequest;
 use App\Http\Requests\AnggotaStoreRequest;
 use App\Http\Requests\AnggotaUpdateRequest;
 use App\Models\Anggota;
-use App\Models\JenisTabungan;
-use App\Models\Tabungan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
-use DateInterval;
-use DatePeriod;
-use DateTime;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 
 class AnggotaController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(Anggota::class, 'anggota');
-    }
-
+    /**
+     * Menampilkan halaman utama dari anggota
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -37,15 +29,6 @@ class AnggotaController extends Controller
             
             return DataTables::of($data)
                     ->addIndexColumn()
-                    ->editColumn('tagihan', function($data) {
-                        $isPokok = $data->user->tabungan->where('jenis_tabungan_id', 1)->first();
-                        
-                        return [
-                            'pokok' => $isPokok,
-                            'wajib' => '',
-                            'pinjaman' => ''
-                        ];
-                    })
                     ->editColumn('action', function($data) {
                         return $data->id;
                     })
@@ -55,11 +38,23 @@ class AnggotaController extends Controller
         return view('admin.anggota.index');
     }
 
+    /**
+     * Menampilkan formulir untuk membuat resource baru
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function create()
     {
         return view('admin.anggota.create');
     }
 
+    /**
+     * Simpan resource yang baru dibuat di penyimpanan.
+     *
+     * @param  \App\Http\Requests\AnggotaStoreRequest  $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function store(AnggotaStoreRequest $request)
     {
         DB::transaction(function() use ($request) {
@@ -85,16 +80,26 @@ class AnggotaController extends Controller
         return redirect()->route('anggota.index')->withSuccess('Berhasil Disimpan !');
     }
 
+    /**
+     * Menampiklan resource secara spesifik
+     *
+     * @param  \App\Models\Anggota  $anggota
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function show(Request $request, Anggota $anggota)
     {
         return view('admin.anggota.show', compact('anggota'));
     }
 
-    public function edit(Anggota $anggota)
-    {
-        //
-    }
-
+    /**
+     * Perbarui resource yang ditentukan dalam penyimpanan.
+     *
+     * @param  \App\Http\Requests\AnggotaUpdateRequest  $request
+     * @param  \App\Models\Anggota  $anggota
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function update(AnggotaUpdateRequest $request, Anggota $anggota)
     {
         DB::transaction(function() use ($request, $anggota) {
@@ -121,6 +126,13 @@ class AnggotaController extends Controller
         return redirect()->route('anggota.index')->withSuccess('Berhasil Disimpan !');
     }
 
+    /**
+     * Hapus resource yang ditentukan dari penyimpanan.
+     *
+     * @param  \App\Models\Anggota  $anggota
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function destroy(Anggota $anggota)
     {
         try {
@@ -134,9 +146,11 @@ class AnggotaController extends Controller
 
         } catch(QueryException $ex3) {
             DB::rollBack();
+
             if($ex3->getCode() === '23000') {
                 return redirect()->route('anggota.index')->withErrors('Maaf, Tidak dapat menghapus, terdapat data lain yang berhubungan !');
             }
+            
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('anggota.index')->withErrors('Maaf, gagal silahkan dicoba lagi !');

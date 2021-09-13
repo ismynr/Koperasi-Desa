@@ -15,11 +15,13 @@ use Yajra\DataTables\DataTables;
 
 class PinjamanController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(Pinjaman::class, 'pinjaman');
-    }
-
+    /**
+     * Menampilkan halaman utama dari anggota
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -45,12 +47,14 @@ class PinjamanController extends Controller
 
         return view('admin.pinjaman.index');
     }
-
-    public function create()
-    {
-        //
-    }
-
+    
+    /**
+     * Simpan resource angsuran pinjaman yang baru dibuat di penyimpanan.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
         DB::transaction(function() use ($request) {
@@ -64,6 +68,15 @@ class PinjamanController extends Controller
         return redirect()->route('pinjaman.index')->withSuccess('Berhasil Disimpan !');
     }
 
+    /**
+     * Return riwayat tagihan lunas dengan format datatables
+     * dan menampilkan view 
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Pinjaman $pinjaman
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function show(Request $request, Pinjaman $pinjaman)
     {
         // riwayat yang sudah lunas
@@ -81,21 +94,14 @@ class PinjamanController extends Controller
         return view('admin.pinjaman.show', compact('pinjaman'));
     }
 
-    public function edit(Pinjaman $pinjaman)
-    {
-        //
-    }
-
-    public function update(Request $request, Pinjaman $pinjaman)
-    {
-        //
-    }
-
-    public function destroy(Pinjaman $pinjaman)
-    {
-        //
-    }
-
+    /**
+     * Return tagihan pinjaman dengan format datatables
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Pinjaman $pinjaman
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function tagihan(Request $request, Pinjaman $pinjaman)
     {
         // prediksi tagihan untuk angsuran pinjaman
@@ -104,8 +110,8 @@ class PinjamanController extends Controller
         if ($request->ajax()) {
             $data = new Collection;
             $latestAngsuran = AngsuranPinjaman::where('pinjaman_id', $pinjaman->id)->orderBy('angsuran_ke', 'desc')->first();
-
             $no = ($latestAngsuran == null) ? 1:($latestAngsuran->angsuran_ke+1);
+
             foreach ($arr as $item) {
                 $data->push([
                     'angsuran_ke' => $no,
@@ -117,6 +123,7 @@ class PinjamanController extends Controller
                         'jml_angsuran' => round($pinjaman->jml_pinjaman / $pinjaman->tenor),
                     ]
                 ]);
+
                 $no++;
             }
 
@@ -124,6 +131,13 @@ class PinjamanController extends Controller
         }
     }
 
+    /**
+     * Generate tagihan dengan return tanggal sesuai dengan tanggal awal - tanggal akhir
+     * 
+     * @param mixed $pinjaman
+     * 
+     * @return array
+     */
     private function generateTagihan($pinjaman)
     {
         // generate tanggal dari awal daftar anggota
@@ -140,7 +154,14 @@ class PinjamanController extends Controller
 
         return $arr;
     }
-    
+        
+    /**
+     * Menjumlahhkan semua angsuran pinjaman berdasarkan pinjaman_id
+     * 
+     * @param mixed $pinjaman_id
+     * 
+     * @return \App\Models\AngsuranPinjaman
+     */
     private function countAngsuranPinjaman($pinjaman_id)
     {
         return AngsuranPinjaman::where('pinjaman_id', $pinjaman_id)->count();

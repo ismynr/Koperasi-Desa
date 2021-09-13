@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class PengaturanController extends Controller
 {
+    /**
+     * Menampilkan halaman utama
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         $pengaturan = DB::table('pengaturan');
@@ -17,26 +22,14 @@ class PengaturanController extends Controller
         return view('admin.pengaturan.index', compact('pengaturan'));
     }
 
-    public function create()
-    {
-        //
-    }
-
-    public function store(Request $request)
-    {
-        //
-    }
-
-    public function show($id)
-    {
-        //
-    }
-
-    public function edit($id)
-    {
-        //
-    }
-
+    /**
+     * Perbarui resource yang ditentukan dalam penyimpanan.
+     * 
+     * @param \App\Http\Requests\PengaturanRequest $request
+     * @param mixed $id
+     * 
+     * @return \Illuminate\Http\Response
+     */
     public function update(PengaturanRequest $request, $id)
     {
         DB::beginTransaction();
@@ -47,14 +40,10 @@ class PengaturanController extends Controller
 
             DB::commit();
             return redirect()->route('pengaturan.index')->withSuccess('Berhasil Disimpan !');
+
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->route('pengaturan.index')->withErrors('Gagal !');
         }
-    }
-
-    public function destroy($id)
-    {
-        //
     }
 }
